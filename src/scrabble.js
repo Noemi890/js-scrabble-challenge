@@ -1,125 +1,65 @@
-// Task
-// Given a word, compute the scrabble score for that word.
-
-// Letter	Value
-// A, E, I, O, U, L, N, R, S, T	=> 1
-// D, G	=> 2
-// B, C, M, P =>	3
-// F, H, V, W, Y =>	4
-// K	=> 5
-// J, X	=> 8
-// Q, Z	=> 10
-
-
 class Scrabble {
-
-  constructor (word) {
+  constructor(word) {
     this.word = word
+    this.lettersPoints = [
+      [['A', 'E', 'I', 'O', 'U', 'L', 'N', 'R', 'S', 'T'], 1],
+      [['D', 'G'], 2],
+      [['B', 'C', 'M', 'P'], 3],
+      [['F', 'H', 'V', 'W', 'Y'], 4],
+      [['K'], 5],
+      [['J', 'X'], 8],
+      [['Q', 'Z'], 10]
+    ]
+    this.multiplierByChar = {
+      '{': 2,
+      '}': 1,
+      '[': 3,
+      ']': 1,
+    }
   }
 
   score() {
-
-    let finalScore = 0;
+    let finalScore = 0
 
     if (this.word === null) {
-      return finalScore;
+      return finalScore
     }
 
-    let caseInsensitiveWord = this.word.toUpperCase();
+    const caseInsensitiveWord = this.word.toUpperCase()
 
-    let visitedParentheses = "";
+    let multiplier = 1
 
     for (let i = 0; i < caseInsensitiveWord.length; i++) {
-
-      if (["\t", "\n", " "].includes(caseInsensitiveWord[i])) {
-        return finalScore;
+      if (['\t', '\n', ' '].includes(caseInsensitiveWord[i])) {
+        return finalScore
       }
 
-      if (this.isOpenedParentheses(caseInsensitiveWord[i])) {
-        visitedParentheses = caseInsensitiveWord[i];
+      if (this.isMultiplierChar(caseInsensitiveWord[i])) {
+        multiplier = this.getMultiplierByChar(caseInsensitiveWord[i])
         continue
       }
 
-      if (this.isClosedParentheses(caseInsensitiveWord[i])) {
-        visitedParentheses = "";
-        continue
-      }
-      
-      finalScore += this.getScoreByChar(caseInsensitiveWord[i]) * this.getMultiplierByParentheses(visitedParentheses);
+      finalScore += this.getPointByChar(caseInsensitiveWord[i]) * multiplier
     }
 
-    console.log("word =>", caseInsensitiveWord, "Score =>", finalScore)
+    console.log('word =>', caseInsensitiveWord, 'Score =>', finalScore)
 
-    return finalScore;
+    return finalScore
   }
 
-  getScoreByChar(char) {
-    
-    const onePointLetters = ["A", "E", "I", "O", "U", "L", "N", "R", "S", "T"];
-    const twoPointsLetters = ["D", "G"];
-    const threePointsLetters = ["B", "C", "M", "P"];
-    const fourPointsLetters = ["F", "H", "V", "W", "Y"];
-    const fivePointsLetters = ["K"];
-    const eightPointsLetters = ["J", "X"];
-    const tenPointsLetters = ["Q", "Z"];
-
-    if (onePointLetters.includes(char)) {
-      return 1;
-    }
-
-    if (twoPointsLetters.includes(char)) {
-      return 2;
-    }
-
-    if (threePointsLetters.includes(char)) {
-      return 3;
-    }
-
-    if (fourPointsLetters.includes(char)) {
-      return 4;
-    }
-
-    if (fivePointsLetters.includes(char)) {
-      return 5;
-    }
-
-    if (eightPointsLetters.includes(char)) {
-      return 8;
-    }
-
-    if (tenPointsLetters.includes(char)) {
-      return 10;
-    }
-
-    return 0;
+  getPointByChar(char) {
+    const [, point = 0] = this.lettersPoints.find(([chars]) => chars.includes(char)) || []
+    return point
   }
 
-  isOpenedParentheses(char) {
-
-    if ("{" === char || "[" === char) {
-      return true;
-    }
-    return false;
+  isMultiplierChar(char) {
+    return typeof this.multiplierByChar[char] !== 'undefined'
   }
 
-  isClosedParentheses(char) {
-
-    if ("}" === char || "]" === char) {
-      return true;
-    }
-    return false;
-  }
-
-  getMultiplierByParentheses(parentheses) {
-
-    if (parentheses === "{") {
-      return 2;
-    }
-
-    if (parentheses === "[") {
-      return 3;
-    }
-    return 1;
+  getMultiplierByChar(char) {
+    return typeof this.multiplierByChar[char] !== 'undefined'
+      ? this.multiplierByChar[char]
+      : 1
   }
 }
 
